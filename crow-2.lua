@@ -6,11 +6,13 @@
 
 local volts = 0
 local mode = "none"
-local rate = 0.1
+local state = 0
 
 function init()
-  crow.input[1].stream = stream
   crow.input[1].mode("none")
+  crow.input[1].stream = stream
+  crow.input[2].mode("change")
+  crow.input[2].change = change
   screen.level(15)
   screen.aa(0)
   screen.line_width(1)
@@ -21,12 +23,19 @@ function stream(v)
   redraw()
 end
 
+function change(s)
+  state = s
+  redraw()
+end
+
 function redraw()
   screen.clear()
   screen.move(10,40)
-  screen.text("volts: "..string.format("%.3f",volts))
+  screen.text("1. volts: "..string.format("%.3f",volts))
   screen.move(10,50)
-  screen.text("mode: "..mode)
+  screen.text("1. mode: "..mode)
+  screen.move(10,60)
+  screen.text("2. change: "..state)
   screen.move(2,40)
   screen.line_rel(0,volts*-4)
   screen.stroke()
