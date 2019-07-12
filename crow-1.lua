@@ -19,10 +19,10 @@ end
 
 function enc(n,z)
   if n==2 then
-    volts = util.clamp(-5,10,volts + z*1)
+    volts = util.clamp(volts + z*1,-5,10)
     crow.output[1].volts = volts
    elseif n==3 then
-    volts = util.clamp(-5,10,volts+ z*0.01)
+    volts = util.clamp(volts+ z*0.01,-5,10)
     crow.output[1].volts = volts
   end
   redraw()
