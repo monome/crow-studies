@@ -11,7 +11,7 @@ local scope = 0
 function init()
   crow.output[1].volts = volts
 
-  crow.input[1].mode("stream")
+  crow.input[1].mode("stream", 0.02)
   crow.input[1].stream = stream
 
   screen.level(15)
