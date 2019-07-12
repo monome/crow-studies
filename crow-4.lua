@@ -3,6 +3,9 @@
 --
 -- connect output 1 to input 1
 --   for a scope
+--
+-- K2 activates LFO
+-- K3 triggers envelope
 
 local volts = 0
 local slew = 0
