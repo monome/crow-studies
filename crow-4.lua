@@ -54,7 +54,7 @@ end
 
 function key(n,z)
   if n==2 and z==1 then
-    crow.output[1].action = "lfo(2,0.5)"
+    crow.output[1].action = "lfo(1,4)"
     crow.output[1].execute()
   elseif n==3 and z==1 then
     crow.output[1].action = "{to(8,0.25),to(0,2)}"
