@@ -1,2 +1,1 @@
-# rising
-crow examples
+# rising: crow studies
