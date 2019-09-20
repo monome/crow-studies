@@ -1,64 +1,62 @@
--- crow example 4
--- advanced output
+-- rising: crow study 4
+-- asl (advanced output)
 --
--- connect output 1 to input 1
---   for a scope
+-- output 1 = LFO
+-- output 2 = envelope
 --
--- K2 activates LFO
+-- K2 randomizes LFO
 -- K3 triggers envelope
 
-local volts = 0
-local slew = 0
-local scope = 0
+local scope = {0,0}
+local rate = 1
 
 function init()
-  crow.output[1].volts = volts
-
-  crow.input[1].mode("stream", 0.02)
-  crow.input[1].stream = stream
-
+  crow.output[1].receive = function(v) out(1,v) end
+  crow.output[2].receive = function(v) out(2,v) end
+  
+  r = metro.init()
+  r.time = 0.05 
+  r.event = function()
+    crow.output[1].query()
+    crow.output[2].query()
+    redraw()
+  end
+  r:start()
+  
   screen.level(15)
   screen.aa(0)
   screen.line_width(1)
 end
 
-function stream(v)
-  scope = v
-  redraw()
+function out(i,v)
+  scope[i] = v
 end
 
 function redraw()
   screen.clear()
   screen.move(10,40)
-  screen.text("volts: "..string.format("%.3f",volts))
+  screen.text("1. lfo rate: "..string.format("%.1f",rate))
   screen.move(10,50)
-  screen.text("slew: "..string.format("%.3f",slew))
+  --screen.text(": "..string.format("%.3f",slew))
 
   screen.move(2,40)
-  screen.line_rel(0,scope*-4)
+  screen.line_rel(0,scope[1]*-4)
   screen.stroke()
-
+  screen.move(4,40)
+  screen.line_rel(0,scope[2]*-4)
+  screen.stroke()
+ 
   screen.update()
 end
 
-function enc(n,z)
-  if n==2 then
-    volts = util.clamp(volts + z*1,-5,10)
-    crow.output[1].volts = volts
-   elseif n==3 then
-    slew = util.clamp(slew + z*0.1,0,5)
-    crow.output[1].slew = slew
-  end
-  redraw()
-end 
-
 function key(n,z)
   if n==2 and z==1 then
-    crow.output[1].action = "lfo(1,4)"
+    rate = 0.1 + math.random(10)/10
+    crow.output[1].action = "lfo("..rate..",4)"
     crow.output[1].execute()
   elseif n==3 and z==1 then
-    crow.output[1].action = "{to(8,0.25),to(0,2)}"
-    crow.output[1].execute()
+    crow.output[2].action = "{to(8,0.15),to(0,1)}"
+    crow.output[2].execute()
   end
   redraw()
 end

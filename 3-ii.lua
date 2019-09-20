@@ -1,7 +1,10 @@
--- crow example 3
+-- rising: crow study 3
 -- ii -> JF
 --
 -- connect JF via ii
+--
+-- K2: play ascending note
+-- K3: play random note
 
 m = require 'musicutil'
 
@@ -21,7 +24,7 @@ end
 function redraw()
   screen.clear()
   screen.move(10,40)
-  screen.text("note: "..note)
+  screen.text("ii.jf.play_note: "..note)
   screen.update()
 end
 

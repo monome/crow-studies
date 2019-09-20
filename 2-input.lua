@@ -1,5 +1,8 @@
--- crow example 2
--- input query and stream
+-- rising: crow study 2
+-- input modes
+--
+-- input 1 is stream/query
+-- input 2 is change
 --
 -- K2 query
 -- K3 toggle mode
@@ -11,7 +14,7 @@ local state = 0
 function init()
   crow.input[1].mode("none")
   crow.input[1].stream = stream
-  crow.input[2].mode("change")
+  crow.input[2].mode("change",2,0.1,"both")
   crow.input[2].change = change
   screen.level(15)
   screen.aa(0)
