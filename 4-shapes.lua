@@ -1,5 +1,5 @@
 -- rising: crow study 4
--- asl (advanced output)
+-- shapes (advanced output)
 --
 -- output 1 = LFO
 -- output 2 = envelope
