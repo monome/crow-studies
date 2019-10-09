@@ -1,104 +1,75 @@
--- crow-ansible
--- testing output to ansible
+-- crow example for ansible
+-- (requires ansible)
 --
--- ENC2 and grid row 7 affects crow output 1
--- ENC3 and grid row 8 affects ansible cv channel 1
-
--- devices
-local g = grid.connect()
-crow.ii.pullup(true)
-
-local MIN_VOLTS = 0
-local MAX_VOLTS = 10
+-- E1 adjust ch 1 slew time
+-- E2 adjust ch 1 volt
+-- E3 adjust ch 1 volt (fine)
+-- K2 changes the ansible channel
+-- K3 zeros out all outputs
 
 local volts = 0
-local ansible_volts = 0
-local ansible_channel = 0 -- note that channel ONE on the ansible is 0 in code
+local slew = 0
 
-local function clear_grid()
-    for y = 1, 8 do
-        for x = 1, 16 do
-            g:led(x, y, 0)
-        end
-    end
-end
-
-local function volts_to_grid_row(v)
-    return util.round(util.linlin(MIN_VOLTS, MAX_VOLTS, 1, 16, v))
-end
-
-local function grid_pos_to_volts(x_pos)
-    return util.linlin(1, 16, MIN_VOLTS, MAX_VOLTS, x_pos)
-end
-
-local function light_row_by_volts(v, row_num)
-    local level = volts_to_grid_row(v)
-    for i = 1, level do
-        g:led(i, row_num, i - 1)
-    end
-end
-
-local function redraw_grid()
-    clear_grid()
-
-    light_row_by_volts(volts, 7)
-    light_row_by_volts(ansible_volts, 8)
-
-    g:refresh()
-end
-
-local function update_voltage()
-    crow.output[1].volts = volts
-    crow.ii.ansible.cv(ansible_channel, ansible_volts)
-end
+-- note that channel *1* on the ansible panel is *0* in code
+-- as of v1.0.0 of crow
+local ansible_channel = 0
+local num_channels = 3
 
 function init()
-    crow.output[1].slew = 0
-    crow.ii.ansible.cv_slew(0, 0)
-end
+    crow.ii.pullup(true)
+    crow.ii.ansible.cv(ansible_channel, volts)
+    crow.ii.ansible.cv_slew(ansible_channel, slew)
 
-function enc(n, d)
-    if n == 2 then
-        volts = util.clamp(volts + (d * 0.2), MIN_VOLTS, MAX_VOLTS)
-    end
-    if n == 3 then
-        ansible_volts = util.clamp(ansible_volts + (d * 0.2), MIN_VOLTS, MAX_VOLTS)
-    end
-
-    update_voltage()
-
-    redraw_grid()
-    redraw()
-end
-
-function key(n, z)
-    print(n .. "," .. z)
-    redraw_grid()
-    redraw()
-end
-
-g.key = function(x, y, z)
-    if (y == 8) then
-        ansible_volts = grid_pos_to_volts(x)
-    end
-    if (y == 7) then
-        volts = grid_pos_to_volts(x)
-    end
-
-    update_voltage()
-
-    redraw_grid()
-    redraw()
+    screen.level(15)
+    screen.aa(0)
+    screen.line_width(1)
 end
 
 function redraw()
     screen.clear()
-
-    screen.move(6, 24)
-    screen.text("crow ch 1 output:  " .. volts)
-
-    screen.move(6, 36)
-    screen.text("ansible ch 1 output:  " .. ansible_volts)
+    screen.move(10, 10)
+    screen.text("ansible channel        " .. ansible_channel + 1)
+    screen.move(10, 30)
+    screen.text("volts: " .. string.format("%.2f", volts))
+    screen.move(10, 40)
+    screen.text("slew: " .. string.format("%.2f", slew))
 
     screen.update()
+end
+
+function enc(n, z)
+    if n == 1 then
+        -- slew value
+        slew = util.clamp(slew + z * 0.25, 0, 10)
+        crow.ii.ansible.cv_slew(ansible_channel, slew)
+    elseif n == 2 then
+        -- course cv output
+        -- note that unlike crow, ansible can only output 0 to 10v, not -5 to 10v
+        volts = util.clamp(volts + z * 1, 0, 10)
+        crow.ii.ansible.cv(ansible_channel, volts)
+    elseif n == 3 then
+        -- fine cv output
+        volts = util.clamp(volts + z * 0.01, 0, 10)
+        crow.ii.ansible.cv(ansible_channel, volts)
+    end
+    redraw()
+end
+
+function key(n, z)
+    if (n == 2 and z == 1) then
+        -- change channels
+        if (ansible_channel < num_channels) then
+            ansible_channel = ansible_channel + 1
+        else
+            ansible_channel = 0
+        end
+    end
+    if (n == 3 and z == 1) then
+        -- zero out all the outputs
+        volts = 0
+        for i = 0, num_channels do
+            crow.ii.ansible.cv(i, volts)
+        end
+    end
+    redraw()
 end
