@@ -21,8 +21,8 @@ local ExtRange = ExtMax - ExtMin
 function init()
   -- keep the line below only if you don't have a 
   -- powered busboard or teletype connected to your ii network
-  crow.II.pullup(true)
-  crow.II.jf.mode(1)
+  crow.ii.pullup(true)
+  crow.ii.jf.mode(1)
   screen.level(15)
   screen.aa(0)
   screen.line_width(1)
@@ -60,7 +60,7 @@ function stream(v)
   elseif note < 1 then
     note = 1
   end
-  crow.II.jf.play_note(scale[note]/12-1,math.random(5)+1)
+  crow.ii.jf.play_note(scale[note]/12-1,math.random(5)+1)
   redraw()
 end
 
