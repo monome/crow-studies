@@ -6,9 +6,12 @@
 --
 -- K2 randomizes LFO
 -- K3 triggers envelope
+-- E3 shapes envelope
 
 local scope = {0,0}
 local rate = 1
+shapes = {"linear","exponential","logarithmic","sine","over","under","now","wait","rebound"}
+shape = 1
 
 function init()
   crow.output[1].receive = function(v) out(1,v) end
@@ -37,7 +40,7 @@ function redraw()
   screen.move(10,40)
   screen.text("1. lfo rate: "..string.format("%.1f",rate))
   screen.move(10,50)
-  --screen.text(": "..string.format("%.3f",slew))
+  screen.text("2. env shape: "..shapes[shape])
 
   screen.move(2,40)
   screen.line_rel(0,scope[1]*-4)
@@ -55,8 +58,15 @@ function key(n,z)
     crow.output[1].action = "lfo("..rate..",4)"
     crow.output[1].execute()
   elseif n==3 and z==1 then
-    crow.output[2].action = "{to(8,0.15),to(0,1)}"
+    crow.output[2].action = "{to(8,0.15),to(0,1,'"..shapes[shape].."')}"
     crow.output[2].execute()
   end
   redraw()
+end
+
+function enc(n,d)
+  if n == 3 then
+    shape = util.clamp(shape+d,1,#shapes)
+    redraw()
+  end
 end
