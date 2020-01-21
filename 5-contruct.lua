@@ -1,4 +1,5 @@
--- construct
+-- rising: crow study 5
+-- construct (extended shapes)
 -- ~  ~  ~  ~
 -- four linked lfos
 -- with variable stages + shapes
