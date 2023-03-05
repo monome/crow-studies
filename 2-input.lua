@@ -13,20 +13,20 @@ local state = 0
 
 function init()
   crow.input[1].mode("none")
-  crow.input[1].stream = stream
+  crow.input[1].stream = process_stream
   crow.input[2].mode("change",2,0.1,"both")
-  crow.input[2].change = change
+  crow.input[2].change = process_change
   screen.level(15)
   screen.aa(0)
   screen.line_width(1)
 end
 
-function stream(v)
+function process_stream(v)
   volts = v
   redraw()
 end
 
-function change(s)
+function process_change(s)
   state = s
   redraw()
 end
