@@ -12,9 +12,6 @@ note = 1
 scale = m.generate_scale(0,"minor",2)
 
 function init()
-  -- keep the line below only if you don't have a 
-  -- powered busboard or teletype connected to your ii network
-  crow.ii.pullup(true)
   crow.ii.jf.mode(1)
   screen.level(15)
   screen.aa(0)
